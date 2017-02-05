@@ -1,5 +1,6 @@
 import React from 'react';
 import openWeatherMap from 'openWeatherMap';
+import ErrorMessage from 'ErrorMessage';
 
 class WeatherForm extends React.Component {
 
@@ -14,7 +15,7 @@ class WeatherForm extends React.Component {
     return (
       <form onSubmit={this.onFormSubmit}>
         <input type="text" placeholder="Enter City Name" ref={(input) => {this.CityName = input}} />
-        <input type="submit" value="Get Weather" />
+        <button className="hollow button expanded" href="#">Get Weather</button>
       </form>
     )
   }
@@ -35,7 +36,8 @@ class GetWeather extends React.Component {
     this.onCitySubmit = this.onCitySubmit.bind(this);
 
     this.state = {
-      isLoading:false
+      isLoading:false,
+      errorMessage: undefined
     }
   }
 
@@ -50,10 +52,32 @@ class GetWeather extends React.Component {
         isLoading:false
       });
 
-    }, (err) => {
-      this.setState({isLoading:false});
-      console.log(err);
+    }, (e) => {
+      console.log('open weather callback',e.message);
+      this.setState({
+        isLoading:false,
+        errorMessage:e.message,
+        city:undefined,
+        temp:undefined
+      });
+
+
     })
+
+  }
+
+  componentWillReceiveProps(newProps){
+
+    let location = newProps.location.query.location;
+
+    if (location && location.length > 0) {
+      //run open weather Search
+      this.onCitySubmit(location);
+      window.location.hash = '#/';
+    }
+  }
+
+  componentDidMount() {
 
   }
 
@@ -72,11 +96,21 @@ class GetWeather extends React.Component {
       }
     }
 
+    let renderErrorMessage = () => {
+      if (typeof this.state.errorMessage === 'string') {
+        console.log('display Error Modal');
+        return  <ErrorMessage message={this.state.errorMessage} />
+      }
+    }
+
+    //debugger;
+
     return (
       <div>
-        <h2>Get Weather</h2>
+        <h1 className="text-center">Get Weather</h1>
         <WeatherForm onCitySubmitFtn={this.onCitySubmit} />
         {renderMessage()}
+        {renderErrorMessage()}
       </div>
     )
   }

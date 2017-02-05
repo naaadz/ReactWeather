@@ -10,11 +10,11 @@ export default function getTemp(location) {
     //console.log(res); this is the 'data' property on the whole object returned from the api in browser
 
     if (res.data.cod && res.data.message) {
-      throw new Error(res.data.message)
+      throw new Error('not available at this time 1')
     } else {
       return res.data.main.temp;
     }
   }, function(res){
-    throw new Error(res.data.message)
+    throw new Error('not available at this time 2')
   })
 }
